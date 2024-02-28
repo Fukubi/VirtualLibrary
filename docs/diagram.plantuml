@@ -1,0 +1,44 @@
+@startuml BookClasses
+class Book {
+    +long int id;
+    +String name;
+    +String author;
+    +String publisher;
+    // Because Date don't exist in C
+    +String releaseDate;
+
+    +Book();
+    +void setName(String name);
+    +void setAuthor(String author);
+    +void setPublisher(String publisher);
+    +void setReleaseDate(String releaseDate);
+}
+
+class BookManager {
+    +sqlite *database;
+
+    +BookManager();
+    +~BookManager();
+    +void openDb();
+    +void initializeDb();
+    +void addBook(Book *book);
+    +void updateBook(Book *book);
+    +void removeBook(long int id);
+    +ListBookElement *listBooks();
+    +ListBookElement *findByName(String name);
+    +Book *findById(long int id);
+}
+
+class ListBookElement {
+    +Book *book;
+    +ListBookElement *next;
+
+    +void ListBookElement_initialize();
+    +void ListBookElement_push(Book *book);
+    +void ListBookElement_popBegin();
+    +void ListBookElement_popEnd();
+    +int ListBookElement_isEmpty();
+    +void ListBookElement_destroy();
+}
+
+ListBookElement o-- Book
