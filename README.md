@@ -12,7 +12,7 @@ A Virtual Library created in C to manage your books! This project was created to
 - [x] Execute a search ByName and ById
 - [x] Create a Initial GUI using terminal
 - [x] Create the Class Diagram
-- [ ] Create a GUI outside of terminal
+- [x] Create a GUI outside of terminal
 - [ ] Create a Report Interface
 
 # Build Process
