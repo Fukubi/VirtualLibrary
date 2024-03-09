@@ -17,7 +17,26 @@ A Virtual Library created in C to manage your books! This project was created to
 
 # Build Process
 
-This project builds with the default procedures of a cmake project, so you will just need to install cmake and build it.
+Install the required libraries for the project (SQLite and GTK3.0) using the available method on your OS, the create a build folder in the root directory of the project and go into it
+
+```bash
+mkdir build
+cd build
+```
+
+Use cmake to generate build files and check if the dependencies are installed properly
+
+```bash
+cmake ..
+```
+
+Compile with your default compiler tool (i.e. make)
+
+```bash
+make .
+```
+
+The executable is generated at the src folder
 
 # Libraries Used
 
