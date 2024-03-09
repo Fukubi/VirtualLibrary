@@ -23,3 +23,4 @@ This project builds with the default procedures of a cmake project, so you will 
 
 - SQLite (https://www.sqlite.org/)
 - Log.c (https://github.com/rxi/log.c)
+- GTK3.0 (https://www.gtk.org/)
