@@ -4,7 +4,7 @@ A Virtual Library created in C to manage your books! This project was created to
 
 # Preview
 
-![list preview](https://github.com/Fukubi/VirtualLibrary/blob/main/docs/PreviewList.png?raw=true)
+![list preview](https://github.com/Fukubi/VirtualLibrary/blob/main/docs/PreviewGUIV1.0.png?raw=true)
 
 # To-Do
 - [x] Connect with Database
