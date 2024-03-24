@@ -68,11 +68,10 @@ void BookManager_addBook(BookManager *bm, Book *book) {
   int resCode;
   sqlite3_stmt *stmt;
 
-  resCode =
-      sqlite3_prepare_v2(bm->database,
-                         "INSERT INTO books (name, author, publisher, "
-                         "releaseDate, price) VALUES (?, ?, ?, ?, ?);",
-                         -1, &stmt, NULL);
+  resCode = sqlite3_prepare_v2(bm->database,
+                               "INSERT INTO books (name, author, publisher, "
+                               "releaseDate, price) VALUES (?, ?, ?, ?, ?);",
+                               -1, &stmt, NULL);
 
   if (resCode != SQLITE_OK) {
     log_error("Error while initializing statement: %s",
@@ -221,9 +220,9 @@ ListBookElement *BookManager_findByName(BookManager *bm, const char *name) {
 
   ListBookElement_initialize(&books);
 
-  resCode = sqlite3_prepare_v2(bm->database,
-                               "SELECT * FROM books WHERE name LIKE ? COLLATE NOCASE;", -1,
-                               &stmt, NULL);
+  resCode = sqlite3_prepare_v2(
+      bm->database, "SELECT * FROM books WHERE name LIKE ? COLLATE NOCASE;", -1,
+      &stmt, NULL);
 
   if (resCode != SQLITE_OK) {
     log_error("Error while initializing statement: %s",
@@ -231,7 +230,73 @@ ListBookElement *BookManager_findByName(BookManager *bm, const char *name) {
     exit(EXIT_FAILURE);
   }
 
-  resCode = sqlite3_bind_text(stmt, 1, name, -1, SQLITE_TRANSIENT);
+  char buffer[strlen(name) + 7];
+  strcpy(buffer, "%");
+  strcat(buffer, name);
+  strcat(buffer, "%");
+  resCode = sqlite3_bind_text(stmt, 1, buffer, -1, SQLITE_TRANSIENT);
+
+  if (resCode != SQLITE_OK) {
+    log_error("Error while binding statement: %s",
+              sqlite3_errmsg(bm->database));
+    log_error("Statement: %s\n", sqlite3_sql(stmt));
+    exit(EXIT_FAILURE);
+  }
+
+  while (sqlite3_step(stmt) != SQLITE_DONE) {
+    Book *book = (Book *)malloc(sizeof(Book));
+    book->id = sqlite3_column_int64(stmt, 0);
+    Book_setName(book, sqlite3_column_text(stmt, 1));
+    Book_setAuthor(book, sqlite3_column_text(stmt, 2));
+    Book_setPublisher(book, sqlite3_column_text(stmt, 3));
+    Book_setReleaseDate(book, sqlite3_column_text(stmt, 4));
+    book->price = sqlite3_column_double(stmt, 5);
+
+    ListBookElement_push(&books, book);
+  }
+
+  resCode = sqlite3_finalize(stmt);
+
+  if (resCode != SQLITE_OK) {
+    log_error("Error while executing statement: %s",
+              sqlite3_errmsg(bm->database));
+    exit(EXIT_FAILURE);
+  }
+
+  return books;
+}
+
+ListBookElement *BookManager_findByAuthor(BookManager *bm, const char *author) {
+  int resCode;
+  sqlite3_stmt *stmt;
+  ListBookElement *books;
+
+  ListBookElement_initialize(&books);
+
+  resCode = sqlite3_prepare_v2(
+      bm->database,
+      "SELECT * FROM books WHERE author LIKE ? COLLATE NOCASE;", -1,
+      &stmt, NULL);
+
+  if (resCode != SQLITE_OK) {
+    log_error("Error while initializing statement: %s",
+              sqlite3_errmsg(bm->database));
+    exit(EXIT_FAILURE);
+  }
+  char buffer[strlen(author) + 7];
+  strcpy(buffer, "%");
+  strcat(buffer, author);
+  strcat(buffer, "%");
+  
+  resCode =
+      sqlite3_bind_text(stmt, 1, buffer, -1, SQLITE_TRANSIENT);
+
+  if (resCode != SQLITE_OK) {
+    log_error("Error while binding statement: %s",
+              sqlite3_errmsg(bm->database));
+    log_error("Statement: %s\n", sqlite3_sql(stmt));
+    exit(EXIT_FAILURE);
+  }
 
   while (sqlite3_step(stmt) != SQLITE_DONE) {
     Book *book = (Book *)malloc(sizeof(Book));

@@ -354,6 +354,64 @@ static void onDeleteButtonClick(GtkWidget *widget, gpointer data) {
   }
 }
 
+static void onEntryAuthorChanged(GtkWidget *widget, gpointer data) {
+  BookManager bookManager;
+  ListBookElement *books;
+  GtkWidget *entry = (GtkWidget *)data;
+  const gchar *author = gtk_entry_get_text(GTK_ENTRY(entry));
+
+  BookManager_initialize(&bookManager);
+  ListBookElement_initialize(&books);
+
+  if (strlen(author) > 0) {
+    books = BookManager_findByAuthor(&bookManager, author);
+  } else {
+    books = BookManager_listBooks(&bookManager);
+  }
+
+  gtk_list_store_clear(listBooksStore);
+  for (ListBookElement *el = books; el != NULL; el = el->next) {
+    gtk_list_store_append(listBooksStore, &iter);
+
+    gtk_list_store_set(listBooksStore, &iter, ID_COLUMN, el->book->id,
+                       NAME_COLUMN, el->book->name, AUTHOR_COLUMN,
+                       el->book->author, PUBLISHER_COLUMN, el->book->publisher,
+                       RELEASE_DATE_COLUMN, el->book->releaseDate, PRICE_COLUMN,
+                       el->book->price, -1);
+  }
+  ListBookElement_destroy(&books);
+  BookManager_destroy(&bookManager);
+}
+
+static void onEntryNameChanged(GtkWidget *widget, gpointer data) {
+  BookManager bookManager;
+  ListBookElement *books;
+  GtkWidget *entry = (GtkWidget *)data;
+  const gchar *name = gtk_entry_get_text(GTK_ENTRY(entry));
+
+  BookManager_initialize(&bookManager);
+  ListBookElement_initialize(&books);
+
+  if (strlen(name) > 0) {
+    books = BookManager_findByName(&bookManager, name);
+  } else {
+    books = BookManager_listBooks(&bookManager);
+  }
+
+  gtk_list_store_clear(listBooksStore);
+  for (ListBookElement *el = books; el != NULL; el = el->next) {
+    gtk_list_store_append(listBooksStore, &iter);
+
+    gtk_list_store_set(listBooksStore, &iter, ID_COLUMN, el->book->id,
+                       NAME_COLUMN, el->book->name, AUTHOR_COLUMN,
+                       el->book->author, PUBLISHER_COLUMN, el->book->publisher,
+                       RELEASE_DATE_COLUMN, el->book->releaseDate, PRICE_COLUMN,
+                       el->book->price, -1);
+  }
+  ListBookElement_destroy(&books);
+  BookManager_destroy(&bookManager);
+}
+
 void activateMainWindow(GtkApplication *app, gpointer user_data) {
   GtkWidget *window;
 
@@ -365,6 +423,10 @@ void activateMainWindow(GtkApplication *app, gpointer user_data) {
   GtkWidget *buttonNew;
   GtkWidget *buttonEdit;
   GtkWidget *buttonDelete;
+
+  GtkWidget *labelFilter;
+  GtkWidget *entryAuthor;
+  GtkWidget *entryName;
 
   GtkWidget *scrolledWindow;
   GtkWidget *listBook;
@@ -460,6 +522,13 @@ void activateMainWindow(GtkApplication *app, gpointer user_data) {
   buttonEdit = gtk_button_new_with_label("Edit Book");
   buttonDelete = gtk_button_new_with_label("Delete Book");
 
+  // Filter label
+  labelFilter = gtk_label_new("Filters: ");
+
+  // Entry filter
+  entryName = gtk_entry_new();
+  entryAuthor = gtk_entry_new();
+
   /**
    * Setting Values
    */
@@ -486,6 +555,12 @@ void activateMainWindow(GtkApplication *app, gpointer user_data) {
   g_signal_connect(buttonDelete, "clicked", G_CALLBACK(onDeleteButtonClick),
                    listBook);
 
+  // Entries
+  gtk_entry_set_placeholder_text(GTK_ENTRY(entryAuthor), "Author Name");
+  g_signal_connect(entryAuthor, "changed", G_CALLBACK(onEntryAuthorChanged), (gpointer)entryAuthor);
+  gtk_entry_set_placeholder_text(GTK_ENTRY(entryName), "Book Name");
+  g_signal_connect(entryName, "changed", G_CALLBACK(onEntryNameChanged), (gpointer)entryName);
+
   /**
    * Setting hierarchy
    */
@@ -496,7 +571,10 @@ void activateMainWindow(GtkApplication *app, gpointer user_data) {
   gtk_grid_attach(GTK_GRID(gridContainer), buttonNew, 0, 0, 1, 1);
   gtk_grid_attach(GTK_GRID(gridContainer), buttonEdit, 1, 0, 1, 1);
   gtk_grid_attach(GTK_GRID(gridContainer), buttonDelete, 2, 0, 1, 1);
-  gtk_grid_attach(GTK_GRID(gridContainer), scrolledWindow, 0, 1, 3, 3);
+  gtk_grid_attach(GTK_GRID(gridContainer), labelFilter, 0, 1, 1, 1);
+  gtk_grid_attach(GTK_GRID(gridContainer), entryName, 1, 1, 1, 1);
+  gtk_grid_attach(GTK_GRID(gridContainer), entryAuthor, 2, 1, 1, 1);
+  gtk_grid_attach(GTK_GRID(gridContainer), scrolledWindow, 0, 2, 3, 3);
 
   gtk_widget_show_all(window);
 }

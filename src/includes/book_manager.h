@@ -7,6 +7,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define DATABASE_FILENAME "database.db"
 
@@ -23,6 +24,7 @@ void BookManager_updateBook(BookManager *bm, Book *book);
 void BookManager_removeBook(BookManager *bm, long int id);
 ListBookElement *BookManager_listBooks(BookManager *bm);
 ListBookElement *BookManager_findByName(BookManager *bm, const char *name);
+ListBookElement *BookManager_findByAuthor(BookManager *bm, const char *name);
 Book BookManager_findById(BookManager *bm, long int id);
 
 #endif
